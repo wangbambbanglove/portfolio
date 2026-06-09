@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Portfolio | Light & Structure</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    colors: {
+                        concrete: {
+                            100: '#F5F5F5',
+                            200: '#E0E0E0',
+                            300: '#CCCCCC',
+                            400: '#A3A3A3',
+                            500: '#7A7A7A',
+                            800: '#2A2A2A',
+                            900: '#1A1A1A',
+                        },
+                        steel: '#111111',
+                    },
+                    backgroundImage: {
+                        'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F5F5F5; /* Concrete Light */
+            color: #111111;
+            position: relative;
+        }
+        
+        /* Subtle concrete noise texture */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.03%22/%3E%3C/svg%3E');
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Structural lines (Renzo Piano style) */
+        .grid-lines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background-size: 25% 100%, 100% 25%;
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Image hover effect (Structural overlay) */
+        .project-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .project-card img {
+            transition: transform 0.7s ease, filter 0.7s ease;
+            filter: grayscale(100%);
+        }
+        .project-card:hover img {
+            transform: scale(1.03);
+            filter: grayscale(0%);
+        }
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .project-card:hover::after {
+            opacity: 1;
+        }
+        
+        /* Light Slit (Tadao Ando style) */
+        .light-slit {
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1) 50%, rgba(255,255,255,0));
+            position: absolute;
+            box-shadow: 0 0 20px 5px rgba(255,255,255,0.5);
+            opacity: 0.8;
+        }
+
+        /* --- Lens Interaction Styles --- */
+        :root {
+            --mouse-x: 50vw;
+            --mouse-y: 50vh;
+            --lens-radius: 0px;
+            --ui-size: 80px;
+        }
+
+        #lens-overlay {
+            backdrop-filter: blur(12px) grayscale(100%);
+            -webkit-backdrop-filter: blur(12px) grayscale(100%);
+            background-color: rgba(245, 245, 245, 0.3);
+            /* 마우스 위치를 중심으로 투명한 구멍을 뚫는 마스크 효과 */
+            mask-image: radial-gradient(circle at var(--mouse-x) var(--mouse-y), transparent 0px, transparent var(--lens-radius), black calc(var(--lens-radius) + 1px), black 100%);
+            -webkit-mask-image: radial-gradient(circle at var(--mouse-x) var(--mouse-y), transparent 0px, transparent var(--lens-radius), black calc(var(--lens-radius) + 1px), black 100%);
+        }
+
+        #lens-ui {
+            width: var(--ui-size);
+            height: var(--ui-size);
+            transform: translate(calc(var(--mouse-x) - 50%), calc(var(--mouse-y) - 50%));
+        }
+
+        .lens-active #lens-ui {
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .lens-active #lens-text {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.2s ease;
+        }
+
+        #lens-text {
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.3s ease 0.1s;
+        }
+
+        body.lens-disabled #lens-overlay,
+        body.lens-disabled #lens-ui {
+            opacity: 0 !important;
+            visibility: hidden;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-concrete-900 selection:text-white select-none cursor-default">
+
+    <!-- Lens Overlay & UI -->
+    <div id="lens-overlay" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-700"></div>
+    <div id="lens-ui" class="fixed top-0 left-0 z-[55] pointer-events-none flex items-center justify-center rounded-full border border-concrete-400 mix-blend-difference hidden md:flex transition-opacity duration-300">
+        <span id="lens-text" class="font-mono text-[10px] text-concrete-300 tracking-widest text-center leading-tight">PRESS<br>& DRAG</span>
+    </div>
+
+    <div class="grid-lines hidden md:block"></div>
+
+    <header class="fixed w-full top-0 z-[60] bg-concrete-100/80 backdrop-blur-md border-b border-concrete-300/50 mix-blend-multiply">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex flex-col">
+                <a href="#" class="text-xl font-bold tracking-tighter uppercase text-steel">H. Architect</a>
+                <span class="text-[10px] font-mono text-concrete-500 tracking-widest">Portfolio 2026</span>
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-mono tracking-wider">
+                <a href="#vision" class="hover:text-concrete-500 transition-colors">01. VISION</a>
+                <a href="#projects" class="hover:text-concrete-500 transition-colors">02. PROJECTS</a>
+                <a href="#profile" class="hover:text-concrete-500 transition-colors">03. PROFILE</a>
+                <button id="toggle-lens" class="ml-4 px-4 py-1.5 border border-steel rounded-full transition-all text-[10px] tracking-widest bg-steel text-white hover:bg-concrete-800">LENS: ON</button>
+            </nav>
+            <button class="md:hidden flex flex-col space-y-1.5 p-2">
+                <span class="w-6 h-px bg-steel block"></span>
+                <span class="w-6 h-px bg-steel block"></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-concrete-900 text-white">
+        <!-- Background Image (Concrete Wall abstraction) -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://placehold.co/1920x1080/1a1a1a/2a2a2a?text=+" alt="Concrete Texture" class="w-full h-full object-cover opacity-60">
+        </div>
+        
+        <!-- Light Slit Effect -->
+        <div class="light-slit left-1/3 z-10 transform -rotate-12 h-[150%] -top-1/4 mix-blend-overlay"></div>
+
+        <div class="relative z-20 max-w-7xl mx-auto px-6 w-full flex flex-col items-start">
+            <p class="font-mono text-xs md:text-sm tracking-[0.3em] text-concrete-400 mb-4 reveal">[ SEC. 00 ] INITIAL PHASE</p>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[1.1] mb-6 reveal" style="transition-delay: 0.2s;">
+                빛이 머무는 공간,<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-concrete-500">구조가 되는 철학.</span>
+            </h1>
+            <p class="max-w-2xl text-lg md:text-xl text-concrete-300 font-light leading-relaxed reveal" style="transition-delay: 0.4s;">
+                안도 타다오의 침묵하는 콘크리트와 렌조 피아노의 투명한 기술적 우아함을 탐구합니다. 공간은 단순한 비어있음이 아니라, 자연과 인간이 교감하는 매개체입니다.
+            </p>
+            <div class="mt-12 reveal" style="transition-delay: 0.6s;">
+                <a href="#projects" class="inline-flex items-center font-mono text-sm border-b border-white pb-1 hover:text-concrete-400 hover:border-concrete-400 transition-all">
+                    EXPLORE PROJECTS
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-20 animate-bounce">
+            <span class="font-mono text-[10px] tracking-widest mb-2 text-concrete-400">SCROLL</span>
+            <div class="w-px h-12 bg-gradient-to-b from-white to-transparent"></div>
+        </div>
+    </section>
+
+    <section id="vision" class="py-32 px-6 border-b border-concrete-300 relative">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
+            <div class="md:col-span-4 reveal">
+                <h2 class="text-3xl font-bold tracking-tight mb-2">건축적 비전</h2>
+                <p class="font-mono text-sm text-concrete-500">[ 01. VISION & PHILOSOPHY ]</p>
+            </div>
+            <div class="md:col-span-8 flex flex-col gap-12">
+                <div class="reveal border-l pl-6 border-steel">
+                    <h3 class="text-xl font-semibold mb-4">묵직한 침묵 속의 빛 (Light in Silence)</h3>
+                    <p class="text-concrete-800 leading-relaxed font-light">
+                        건축의 뼈대를 이루는 콘크리트는 차갑고 무거운 소재이지만, 빛을 받아들이는 순간 가장 감성적인 표면으로 변모합니다. 불필요한 장식을 배제하고 기하학적인 본질만을 남겨, 공간 그 자체가 자연을 담는 그릇이 되도록 설계합니다. 빛과 그림자의 강렬한 대비는 공간에 시간의 흐름을 새겨 넣습니다.
+                    </p>
+                </div>
+                <div class="reveal border-l pl-6 border-steel" style="transition-delay: 0.2s;">
+                    <h3 class="text-xl font-semibold mb-4">구조의 정직성과 투명함 (Honesty of Structure)</h3>
+                    <p class="text-concrete-800 leading-relaxed font-light">
+                        숨겨야 할 부재들을 외부로 드러냄으로써 건축물이 어떻게 서 있는지를 정직하게 보여줍니다. 철골과 유리라는 근대적인 재료를 극도로 세밀하게 다루어 육중함을 덜어내고, 환경과 소통하는 투명하고 가벼운 경계를 창조합니다. 디테일에 대한 집요한 탐구가 전체의 완성도를 결정짓습니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-32 px-6 bg-concrete-200 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-end mb-16 reveal">
+                <div>
+                    <h2 class="text-3xl font-bold tracking-tight mb-2">프로젝트</h2>
+                    <p class="font-mono text-sm text-concrete-500">[ 02. SELECTED WORKS ]</p>
+                </div>
+                <div class="hidden md:block font-mono text-xs text-concrete-500 text-right">
+                    GRID SYS: 4X <br>
+                    SCALE: 1:100
+                </div>
+            </div>
+
+            <!-- Project Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                
+                <!-- Project 1 -->
+                <article class="reveal group">
+                    <div class="project-card bg-white h-[400px] mb-4">
+                        <img src="https://placehold.co/800x600/333/666?text=Cultural+Center" alt="Project 1" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold mb-1 group-hover:text-concrete-500 transition-colors">수도원 문화센터 재생 프로젝트</h3>
+                            <p class="text-sm text-concrete-500 font-light">Exposed Concrete, Glass, Steel Frame</p>
+                        </div>
+                        <span class="font-mono text-xs border border-concrete-300 px-2 py-1">2025</span>
+                    </div>
+                </article>
+
+                <!-- Project 2 -->
+                <article class="reveal md:mt-24 group">
+                    <div class="project-card bg-white h-[400px] mb-4">
+                        <img src="https://placehold.co/800x600/222/555?text=Glass+Pavilion" alt="Project 2" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold mb-1 group-hover:text-concrete-500 transition-colors">보태니컬 글래스 파빌리온</h3>
+                            <p class="text-sm text-concrete-500 font-light">High-tech Structure, Transparent Skin</p>
+                        </div>
+                        <span class="font-mono text-xs border border-concrete-300 px-2 py-1">2024</span>
+                    </div>
+                </article>
+
+                <!-- Project 3 -->
+                <article class="reveal group">
+                    <div class="project-card bg-white h-[400px] mb-4">
+                        <img src="https://placehold.co/800x600/444/777?text=Art+Museum" alt="Project 3" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold mb-1 group-hover:text-concrete-500 transition-colors">해안가 현대미술관</h3>
+                            <p class="text-sm text-concrete-500 font-light">Geometric Minimalism, Water & Light</p>
+                        </div>
+                        <span class="font-mono text-xs border border-concrete-300 px-2 py-1">2023</span>
+                    </div>
+                </article>
+
+                <!-- Project 4 -->
+                <article class="reveal md:mt-24 group">
+                    <div class="project-card bg-white h-[400px] mb-4">
+                        <img src="https://placehold.co/800x600/111/444?text=Urban+Hub" alt="Project 4" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold mb-1 group-hover:text-concrete-500 transition-colors">어반 트랜짓 허브</h3>
+                            <p class="text-sm text-concrete-500 font-light">Tension Cables, Suspended Roof</p>
+                        </div>
+                        <span class="font-mono text-xs border border-concrete-300 px-2 py-1">2022</span>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="profile" class="py-32 px-6 border-t border-concrete-300 bg-white">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
+            <div class="w-full md:w-1/2 reveal">
+                <div class="aspect-square bg-concrete-100 p-8 relative flex items-center justify-center border border-concrete-200">
+                    <!-- Technical Drawing Abstraction -->
+                    <div class="absolute inset-4 border border-dashed border-concrete-300"></div>
+                    <div class="w-3/4 h-3/4 bg-concrete-800 relative z-10 shadow-2xl flex items-center justify-center overflow-hidden">
+                         <img src="https://placehold.co/400x400/1a1a1a/ffffff?text=Architect+Portrait" alt="Architect" class="w-full h-full object-cover opacity-80 mix-blend-luminosity">
+                    </div>
+                    <!-- Crosshair decors -->
+                    <div class="absolute top-0 left-1/2 w-px h-8 bg-concrete-400"></div>
+                    <div class="absolute bottom-0 left-1/2 w-px h-8 bg-concrete-400"></div>
+                    <div class="absolute left-0 top-1/2 h-px w-8 bg-concrete-400"></div>
+                    <div class="absolute right-0 top-1/2 h-px w-8 bg-concrete-400"></div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 reveal" style="transition-delay: 0.2s;">
+                <h2 class="text-3xl font-bold tracking-tight mb-2">홍길동</h2>
+                <p class="font-mono text-sm text-concrete-500 mb-8">[ ARCHITECT / DESIGNER ]</p>
+                <p class="text-concrete-800 mb-6 leading-relaxed font-light">
+                    "건축은 환경에 저항하는 것이 아니라, 환경을 수용하고 그 안에서 질서를 찾아내는 과정입니다." <br><br>
+                    물성의 본질을 이해하고, 정교한 엔지니어링을 바탕으로 공간의 예술적 가치를 실현하고자 합니다. 눈에 보이지 않는 구조적 역학을 시각화하고, 빛이라는 비물질적 요소를 단단한 매스 안으로 끌어들여 생명력을 불어넣는 작업을 이어가고 있습니다.
+                </p>
+                
+                <div class="grid grid-cols-2 gap-4 border-t border-concrete-200 pt-8 mt-8">
+                    <div>
+                        <h4 class="font-mono text-xs text-concrete-500 mb-2">EXPERTISE</h4>
+                        <ul class="text-sm font-light space-y-1">
+                            <li>Public Architecture</li>
+                            <li>Cultural Spaces</li>
+                            <li>Structural Design</li>
+                            <li>Parametric Modeling</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-mono text-xs text-concrete-500 mb-2">CONTACT</h4>
+                        <ul class="text-sm font-light space-y-1">
+                            <li>hello@archi-portfolio.com</li>
+                            <li>+82 10 1234 5678</li>
+                            <li>Seoul, South Korea</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-concrete-900 text-concrete-400 py-12 px-6 border-t-[10px] border-steel">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <span class="text-lg font-bold tracking-tighter text-white uppercase">H. Architect</span>
+                <p class="font-mono text-[10px] tracking-widest mt-1">© 2026 ALL RIGHTS RESERVED.</p>
+            </div>
+            <div class="flex space-x-6 font-mono text-xs">
+                <a href="#" class="hover:text-white transition-colors">INSTAGRAM</a>
+                <a href="#" class="hover:text-white transition-colors">LINKEDIN</a>
+                <a href="#" class="hover:text-white transition-colors">BEHANCE</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Intersection Observer for scroll reveal effect
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: stop observing once revealed
+                        // observer.unobserve(entry.target); 
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+
+            // --- Lens Interaction Logic ---
+            const root = document.documentElement;
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let currentRadius = 0;
+            let targetRadius = 0;
+            let uiSize = 80;
+            let targetUiSize = 80;
+            let lensModeActive = true;
+
+            // 초기 위치 세팅
+            root.style.setProperty('--mouse-x', `${mouseX}px`);
+            root.style.setProperty('--mouse-y', `${mouseY}px`);
+
+            // 마우스/터치 위치 추적
+            function updatePosition(e) {
+                mouseX = e.clientX || (e.touches && e.touches[0].clientX) || mouseX;
+                mouseY = e.clientY || (e.touches && e.touches[0].clientY) || mouseY;
+                root.style.setProperty('--mouse-x', `${mouseX}px`);
+                root.style.setProperty('--mouse-y', `${mouseY}px`);
+            }
+
+            document.addEventListener('mousemove', updatePosition);
+            document.addEventListener('touchmove', updatePosition, { passive: true });
+
+            // 드래그 시작 (크기 확장)
+            function handleDown(e) {
+                if (!lensModeActive) return;
+                // 헤더나 버튼 위에서는 작동하지 않도록 예외 처리
+                if (e.target.closest('header') || e.target.closest('a') || e.target.closest('button')) return;
+                
+                document.body.classList.add('lens-active');
+                targetRadius = 180; // 렌즈 구멍 크기
+                targetUiSize = 360; // 테두리 UI 크기
+            }
+
+            // 드래그 종료 (크기 축소)
+            function handleUp() {
+                if (!lensModeActive) return;
+                document.body.classList.remove('lens-active');
+                targetRadius = 0;
+                targetUiSize = 80;
+            }
+
+            document.addEventListener('mousedown', handleDown);
+            document.addEventListener('touchstart', handleDown, { passive: true });
+            
+            document.addEventListener('mouseup', handleUp);
+            document.addEventListener('touchend', handleUp);
+            document.addEventListener('mouseleave', handleUp);
+
+            // 부드러운 애니메이션 루프 (Easing)
+            function animateLens() {
+                currentRadius += (targetRadius - currentRadius) * 0.12;
+                uiSize += (targetUiSize - uiSize) * 0.12;
+                
+                root.style.setProperty('--lens-radius', `${currentRadius}px`);
+                root.style.setProperty('--ui-size', `${uiSize}px`);
+                
+                requestAnimationFrame(animateLens);
+            }
+            animateLens();
+
+            // 렌즈 토글 버튼 로직
+            const toggleBtn = document.getElementById('toggle-lens');
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 버튼 클릭 시 렌즈 이펙트 트리거 방지
+                lensModeActive = !lensModeActive;
+                
+                if (lensModeActive) {
+                    document.body.classList.remove('lens-disabled');
+                    toggleBtn.innerText = 'LENS: ON';
+                    toggleBtn.classList.add('bg-steel', 'text-white');
+                    toggleBtn.classList.remove('bg-transparent', 'text-steel');
+                } else {
+                    document.body.classList.add('lens-disabled');
+                    toggleBtn.innerText = 'LENS: OFF';
+                    toggleBtn.classList.remove('bg-steel', 'text-white');
+                    toggleBtn.classList.add('bg-transparent', 'text-steel');
+                    handleUp(); // 강제 리셋
+                }
+            });
+        });
+    </script>
+</body>
+</html>
